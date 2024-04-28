@@ -1,189 +1,93 @@
+// Choose error correction code (ECC) parameter (&ecc=H)
+// L (low, ~7% destroyed data may be corrected)
+// M (middle, ~15% destroyed data may be corrected)
+// Q (quality, ~25% destroyed data may be corrected)
+// H (high, ~30% destroyed data may be corrected)
+
+// Choose hex value colour
+// https://api.qrserver.com/v1/create-qr-code/?data=Hello&size=600x600&ecc=H&color=ff0000
+
+// Choose background hex value colour
+// https://api.qrserver.com/v1/create-qr-code/?data=Hello&size=600x600&ecc=H&color=ff0000&bgcolor=000000
+
+// Add a margin from 1 to 50
+// https://api.qrserver.com/v1/create-qr-code/?data=Hello&size=600x600&ecc=H&color=ff0000&bgcolor=000000&margin=50
+
+// Choose format for code:
+// png
+// gif
+// jpeg
+// jpg
+// svg
+// eps
+// https://api.qrserver.com/v1/create-qr-code/?data=Hello&size=600x600&ecc=H&color=ff0000&bgcolor=000000&margin=50&qzone-100&format=png
+
+// Minimum 100x100
+// Maximum if png|gif|jpeg|jpg 1000x1000
+// Maximum if svg|eps 1000000x1000000
+// Choose height and width
+
+// Choose text
+// (Between 1 to 900 characters)
+
+// Encode text
+
+// Send get request to http(s)://api.qrserver.com/v1/create-qr-code/?data=[URL-encoded-text]&size=[pixels]x[pixels]
+// https://api.qrserver.com/v1/create-qr-code/?data=Hello&size=500x500
+
+// export default function Home() {
+//     return (
+//         <main className="container mx-auto">
+//             <div className="grid grid-cols-2">
+//                 Test!
+//             </div>
+//         </main>
+//     );
+// }
+
 "use client";
 
-import React, { useEffect, useRef, useState, ChangeEvent } from "react";
-import QRCodeStyling, {
-    CornerDotType,
-    CornerSquareType,
-    DotType,
-    DrawType,
-    ErrorCorrectionLevel,
-    FileExtension,
-    Mode,
-    Options,
-    TypeNumber,
-} from "qr-code-styling";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import Image from "next/image";
 
-import { Button, Input, Select, SelectItem } from "@nextui-org/react";
-import { imageExtensions } from "./ImageOptions";
-
-// Define a mapping of file extensions to FileExtension types
-const fileExtensionMap: Record<string, FileExtension> = {
-    svg: "svg",
-    png: "png",
-    jpeg: "jpeg",
-    webp: "webp",
-};
-
-interface QrCodeProps {
-    height?: number;
-    width?: number;
-    margin?: number;
-    type?: DrawType | undefined;
-    data?: string;
-    image?: string;
-    qrOptions?: {
-        typeNumber?: TypeNumber;
-        mode?: Mode;
-        errorCorrectionLevel?: ErrorCorrectionLevel;
-    };
-    imageOptions?: {
-        hideBackgroundDots?: boolean;
-        imageSize?: number;
-        margin?: number;
-        crossOrigin?: string;
-    };
-    dotsOptions?: {
-        color?: string;
-        type?: DotType;
-    };
-    backgroundOptions?: {
-        color?: string;
-    };
-    cornersSquareOptions?: {
-        color?: string;
-        type?: CornerSquareType;
-    };
-    cornersDotOptions?: {
-        color?: string;
-        type?: CornerDotType;
-    };
-}
-
-export default function QrCode({
-    height = 300,
-    width = 300,
-    margin = 10,
-    type = "svg" as DrawType,
-    data = "https://karl-horning.github.io",
-    image = "/favicon.ico",
-    qrOptions = {
-        typeNumber: 0 as TypeNumber,
-        mode: "Byte" as Mode,
-        errorCorrectionLevel: "Q" as ErrorCorrectionLevel,
-    },
-    imageOptions = {
-        hideBackgroundDots: true,
-        imageSize: 0.4,
-        margin: 20,
-        crossOrigin: "anonymous",
-    },
-    dotsOptions = {
-        color: "#222222",
-        type: "rounded" as DotType,
-    },
-    backgroundOptions = {
-        color: "#5FD4F3",
-    },
-    cornersSquareOptions = {
-        color: "#222222",
-        type: "extra-rounded" as CornerSquareType,
-    },
-    cornersDotOptions = {
-        color: "#222222",
-        type: "dot" as CornerDotType,
-    },
-}: QrCodeProps) {
-    const [options, setOptions] = useState<Options>({
-        width,
-        height,
-        margin,
-        type,
-        data,
-        image,
-        qrOptions,
-        imageOptions,
-        dotsOptions,
-        backgroundOptions,
-        cornersSquareOptions,
-        cornersDotOptions,
-    });
-    const [fileExt, setFileExt] = useState("svg");
-    const [qrCode] = useState<QRCodeStyling>(new QRCodeStyling(options));
-    const ref = useRef<HTMLDivElement>(null);
+export default function QrCode() {
+    const [qrCodeImage, setQRCodeImage] = useState<string | null>(null);
 
     useEffect(() => {
-        if (ref.current) {
-            qrCode.append(ref.current);
-        }
-    }, [qrCode, ref]);
-
-    useEffect(() => {
-        if (!qrCode) return;
-        qrCode.update(options);
-    }, [qrCode, options]);
-
-    const onDataChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setOptions((options) => ({
-            ...options,
-            data: event.target.value,
-        }));
-    };
-
-    const onExtensionChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        setFileExt(event.target.value);
-    };
-
-    const onDownloadClick = () => {
-        if (!qrCode) return;
-        qrCode.download({
-            extension: fileExtensionMap[fileExt], // Convert string to FileExtension
-        });
-    };
+        // Make a GET request to the QR code API endpoint
+        axios
+            .get(
+                "https://api.qrserver.com/v1/create-qr-code/?data=Hello&size=600x600&ecc=H&color=000000&bgcolor=ffffff&margin=25&qzone-100&format=png",
+                {
+                    responseType: "arraybuffer", // Set response type to arraybuffer
+                }
+            )
+            .then((response) => {
+                // Handle successful response
+                console.log("response:", response);
+                const imageUrl = `data:image/png;base64,${Buffer.from(response.data, "binary").toString("base64")}`;
+                setQRCodeImage(imageUrl);
+            })
+            .catch((error) => {
+                // Handle error
+                console.error("Error fetching QR code:", error);
+            });
+    }, []);
 
     return (
-        <section className="mx-auto">
-            <h2 className="my-4 text-center text-2xl">
-                QR code styling for React
-            </h2>
-            {/* QR Code */}
-            <div ref={ref} />
-            <div>
-                <Input
-                    className="py-4"
-                    label="Text or URL"
-                    onChange={onDataChange}
-                    size="lg"
-                    value={options.data}
-                    variant="faded"
+        <div className="flex h-screen items-center justify-center">
+            {qrCodeImage ? (
+                <Image
+                    src={qrCodeImage}
+                    alt="QR Code"
+                    className="max-h-full max-w-full"
+                    height={500}
+                    width={500}
                 />
-
-                <Select
-                    label="Select an image format"
-                    className="mb-4"
-                    defaultSelectedKeys={[imageExtensions[0].value]}
-                    onChange={onExtensionChange}
-                    value={fileExt}
-                    variant="faded"
-                >
-                    {imageExtensions.map((extension) => (
-                        <SelectItem
-                            key={extension.value}
-                            value={extension.value}
-                        >
-                            {extension.label}
-                        </SelectItem>
-                    ))}
-                </Select>
-
-                <Button
-                    className="mb-4 w-full"
-                    color="primary"
-                    onClick={onDownloadClick}
-                    size="lg"
-                >
-                    Download QR Code
-                </Button>
-            </div>
-        </section>
+            ) : (
+                <p>Loading...</p>
+            )}
+        </div>
     );
 }
