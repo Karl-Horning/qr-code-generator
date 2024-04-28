@@ -12,61 +12,91 @@ import QRCodeStyling, {
     Options,
 } from "qr-code-styling";
 import Extension from "qr-code-styling";
+import { Button, Input, Select, SelectItem } from "@nextui-org/react";
+import { imageExtensions } from "./ImageOptions";
 
-export default function QrCode() {
+interface QrCodeProps {
+    height?: number;
+    width?: number;
+    margin?: number;
+    type?: DrawType | undefined;
+    data?: string;
+    image?: string;
+    qrOptions?: {
+        typeNumber?: TypeNumber;
+        mode?: Mode;
+        errorCorrectionLevel?: ErrorCorrectionLevel;
+    };
+    imageOptions?: {
+        hideBackgroundDots?: boolean;
+        imageSize?: number;
+        margin?: number;
+        crossOrigin?: string;
+    };
+    dotsOptions?: {
+        color?: string;
+        type?: DotType;
+    };
+    backgroundOptions?: {
+        color?: string;
+    };
+    cornersSquareOptions?: {
+        color?: string;
+        type?: CornerSquareType;
+    };
+    cornersDotOptions?: {
+        color?: string;
+        type?: CornerDotType;
+    };
+}
+
+export default function QrCode({
+    height = 300,
+    width = 300,
+    margin = 10,
+    type = "svg" as DrawType,
+    data = "https://karl-horning.github.io",
+    image = "/favicon.ico",
+    qrOptions = {
+        typeNumber: 0 as TypeNumber,
+        mode: "Byte" as Mode,
+        errorCorrectionLevel: "Q" as ErrorCorrectionLevel,
+    },
+    imageOptions = {
+        hideBackgroundDots: true,
+        imageSize: 0.4,
+        margin: 20,
+        crossOrigin: "anonymous",
+    },
+    dotsOptions = {
+        color: "#222222",
+        type: "rounded" as DotType,
+    },
+    backgroundOptions = {
+        color: "#5FD4F3",
+    },
+    cornersSquareOptions = {
+        color: "#222222",
+        type: "extra-rounded" as CornerSquareType,
+    },
+    cornersDotOptions = {
+        color: "#222222",
+        type: "dot" as CornerDotType,
+    },
+}: QrCodeProps) {
     const [options, setOptions] = useState<Options>({
-        width: 300,
-        height: 300,
-        type: "svg" as DrawType,
-        data: "http://qr-code-styling.com",
-        image: "/favicon.ico",
-        margin: 10,
-        qrOptions: {
-            typeNumber: 0 as TypeNumber,
-            mode: "Byte" as Mode,
-            errorCorrectionLevel: "Q" as ErrorCorrectionLevel,
-        },
-        imageOptions: {
-            hideBackgroundDots: true,
-            imageSize: 0.4,
-            margin: 20,
-            crossOrigin: "anonymous",
-        },
-        dotsOptions: {
-            color: "#222222",
-            // gradient: {
-            //   type: 'linear', // 'radial'
-            //   rotation: 0,
-            //   colorStops: [{ offset: 0, color: '#8688B2' }, { offset: 1, color: '#77779C' }]
-            // },
-            type: "rounded" as DotType,
-        },
-        backgroundOptions: {
-            color: "#5FD4F3",
-            // gradient: {
-            //   type: 'linear', // 'radial'
-            //   rotation: 0,
-            //   colorStops: [{ offset: 0, color: '#ededff' }, { offset: 1, color: '#e6e7ff' }]
-            // },
-        },
-        cornersSquareOptions: {
-            color: "#222222",
-            type: "extra-rounded" as CornerSquareType,
-            // gradient: {
-            //   type: 'linear', // 'radial'
-            //   rotation: 180,
-            //   colorStops: [{ offset: 0, color: '#25456e' }, { offset: 1, color: '#4267b2' }]
-            // },
-        },
-        cornersDotOptions: {
-            color: "#222222",
-            type: "dot" as CornerDotType,
-            // gradient: {
-            //   type: 'linear', // 'radial'
-            //   rotation: 180,
-            //   colorStops: [{ offset: 0, color: '#00266e' }, { offset: 1, color: '#4060b3' }]
-            // },
-        },
+        width,
+        height,
+        margin,
+        type,
+        data,
+        image,
+        qrOptions,
+        imageOptions,
+        dotsOptions,
+        backgroundOptions,
+        cornersSquareOptions,
+        cornersDotOptions,
     });
     const [fileExt, setFileExt] = useState<Extension>("svg");
     const [qrCode] = useState<QRCodeStyling>(new QRCodeStyling(options));
@@ -102,37 +132,49 @@ export default function QrCode() {
     };
 
     return (
-        <div className="App">
-            <h2>QR code styling for React</h2>
+        <section className="mx-auto">
+            <h2 className="my-4 text-center text-2xl">
+                QR code styling for React
+            </h2>
+            {/* QR Code */}
             <div ref={ref} />
-            <div style={styles.inputWrapper}>
-                <input
-                    value={options.data}
+            <div>
+                <Input
+                    className="py-4"
+                    label="Text or URL"
                     onChange={onDataChange}
-                    style={styles.inputBox}
+                    size="lg"
+                    value={options.data}
+                    variant="faded"
                 />
-                <select onChange={onExtensionChange} value={fileExt}>
-                    <option value="svg">SVG</option>
-                    <option value="png">PNG</option>
-                    <option value="jpeg">JPEG</option>
-                    <option value="webp">WEBP</option>
-                </select>
-                <button onClick={onDownloadClick}>Download</button>
+
+                <Select
+                    label="Select an image format"
+                    className="mb-4"
+                    defaultSelectedKeys={[imageExtensions[0].value]}
+                    onChange={onExtensionChange}
+                    value={fileExt}
+                    variant="faded"
+                >
+                    {imageExtensions.map((extension) => (
+                        <SelectItem
+                            key={extension.value}
+                            value={extension.value}
+                        >
+                            {extension.label}
+                        </SelectItem>
+                    ))}
+                </Select>
+
+                <Button
+                    className="mb-4 w-full"
+                    color="primary"
+                    onClick={onDownloadClick}
+                    size="lg"
+                >
+                    Download QR Code
+                </Button>
             </div>
-        </div>
+        </section>
     );
 }
-
-const styles = {
-    inputWrapper: {
-        margin: "20px 0",
-        display: "flex",
-        justifyContent: "space-between",
-        width: "100%",
-        maxWidth: "300px",
-    },
-    inputBox: {
-        flexGrow: 1,
-        marginRight: 20,
-    },
-};
