@@ -11,7 +11,7 @@ import QRCodeStyling, {
     CornerDotType,
     Options,
 } from "qr-code-styling";
-import Extension from "qr-code-styling";
+
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import { imageExtensions } from "./ImageOptions";
 
@@ -98,7 +98,7 @@ export default function QrCode({
         cornersSquareOptions,
         cornersDotOptions,
     });
-    const [fileExt, setFileExt] = useState<Extension>("svg");
+    const [fileExt, setFileExt] = useState("svg");
     const [qrCode] = useState<QRCodeStyling>(new QRCodeStyling(options));
     const ref = useRef<HTMLDivElement>(null);
 
@@ -121,7 +121,7 @@ export default function QrCode({
     };
 
     const onExtensionChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        setFileExt(event.target.value as Extension);
+        setFileExt(event.target.value);
     };
 
     const onDownloadClick = () => {
