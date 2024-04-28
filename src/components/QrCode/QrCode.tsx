@@ -2,18 +2,27 @@
 
 import React, { useEffect, useRef, useState, ChangeEvent } from "react";
 import QRCodeStyling, {
-    DrawType,
-    TypeNumber,
-    Mode,
-    ErrorCorrectionLevel,
-    DotType,
-    CornerSquareType,
     CornerDotType,
+    CornerSquareType,
+    DotType,
+    DrawType,
+    ErrorCorrectionLevel,
+    FileExtension,
+    Mode,
     Options,
+    TypeNumber,
 } from "qr-code-styling";
 
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import { imageExtensions } from "./ImageOptions";
+
+// Define a mapping of file extensions to FileExtension types
+const fileExtensionMap: Record<string, FileExtension> = {
+    svg: "svg",
+    png: "png",
+    jpeg: "jpeg",
+    webp: "webp",
+};
 
 interface QrCodeProps {
     height?: number;
@@ -127,7 +136,7 @@ export default function QrCode({
     const onDownloadClick = () => {
         if (!qrCode) return;
         qrCode.download({
-            extension: fileExt,
+            extension: fileExtensionMap[fileExt], // Convert string to FileExtension
         });
     };
 
